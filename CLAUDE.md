@@ -4,16 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
-## Comandos
-
-```bash
-npm run dev      # servidor de desarrollo (localhost:3000)
-npm run build    # build de producción
-npm run start    # servidor de producción
-npm run lint     # ESLint (Next.js config)
-```
-
 No hay suite de tests configurada.
+
+## Skills
+Usa siempre /frontend-design para diseñar el interfaz del usuario.
 
 ## Arquitectura
 
