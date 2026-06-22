@@ -15,5 +15,11 @@ https://github.com/Klerith/fernando-skills
 npx skills@latest add Klerith/fernando-skills
 ```
 
+## Comandos
 
-dsasdadsadsa
+```bash
+npm run dev      # servidor de desarrollo (localhost:3000)
+npm run build    # build de producción
+npm run start    # servidor de producción
+npm run lint     # ESLint (Next.js config)
+```
