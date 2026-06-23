@@ -1,0 +1,116 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "ARCADE VAULT" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: ARCADE VAULT
+      - generic [ref=e7]:
+        - link "Biblioteca" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "Salón de la Fama" [ref=e9] [cursor=pointer]:
+          - /url: /hall-of-fame
+      - generic [ref=e12]: CRÉDITOS · 03
+      - link "Iniciar Sesión" [ref=e13] [cursor=pointer]:
+        - /url: /auth
+    - complementary [ref=e14]:
+      - generic [ref=e15]: MENÚ
+      - link "Biblioteca" [ref=e16] [cursor=pointer]:
+        - /url: /
+      - link "Salón de la Fama" [ref=e17] [cursor=pointer]:
+        - /url: /hall-of-fame
+      - link "Iniciar Sesión" [ref=e18] [cursor=pointer]:
+        - /url: /auth
+      - generic [ref=e20]: CRÉDITOS · 03
+    - main [ref=e21]:
+      - generic [ref=e332]:
+        - generic [ref=e333]:
+          - generic [ref=e335]: •••
+          - generic [ref=e336]:
+            - generic [ref=e337]:
+              - generic [ref=e338]: ARCADE
+              - generic [ref=e339]: 1 JUGADOR
+              - generic [ref=e340]: TECLADO / TÁCTIL
+              - generic [ref=e341]: RETRO 1985
+            - heading "GLOTÓN" [level=2] [ref=e342]
+            - paragraph [ref=e343]: Un círculo glotón patrulla un laberinto coleccionando puntos luminosos. Cuatro espectros lo persiguen, pero cada cierto tiempo aparece una píldora que invierte los papeles.
+            - generic [ref=e344]:
+              - generic [ref=e345]:
+                - generic [ref=e346]: Partidas
+                - generic [ref=e347]: 27.2K
+              - generic [ref=e348]:
+                - generic [ref=e349]: Mejor global
+                - generic [ref=e350]: "96.400"
+              - generic [ref=e351]:
+                - generic [ref=e352]: Dificultad
+                - generic [ref=e353]: ★ ★ ★ ☆ ☆
+            - generic [ref=e354]:
+              - link "▶ JUGAR AHORA" [ref=e355] [cursor=pointer]:
+                - /url: /game/gloton/play
+              - link "VOLVER AL VAULT" [ref=e356] [cursor=pointer]:
+                - /url: /
+        - complementary [ref=e357]:
+          - generic [ref=e358]:
+            - heading "MEJORES PUNTUACIONES" [level=3] [ref=e359]
+            - generic [ref=e360]:
+              - generic [ref=e361]: "#01"
+              - generic [ref=e362]:
+                - text: DROID_X
+                - generic [ref=e363]: 09/08/2026
+              - generic [ref=e364]: "278.331"
+            - generic [ref=e365]:
+              - generic [ref=e366]: "#02"
+              - generic [ref=e367]:
+                - text: RGB_QUEEN
+                - generic [ref=e368]: 13/06/2026
+              - generic [ref=e369]: "272.497"
+            - generic [ref=e370]:
+              - generic [ref=e371]: "#03"
+              - generic [ref=e372]:
+                - text: GLITCHA
+                - generic [ref=e373]: 19/08/2026
+              - generic [ref=e374]: "180.574"
+            - generic [ref=e375]:
+              - generic [ref=e376]: "#04"
+              - generic [ref=e377]:
+                - text: CYBER_LU
+                - generic [ref=e378]: 09/03/2026
+              - generic [ref=e379]: "169.983"
+            - generic [ref=e380]:
+              - generic [ref=e381]: "#05"
+              - generic [ref=e382]:
+                - text: JOY_STK
+                - generic [ref=e383]: 25/06/2026
+              - generic [ref=e384]: "129.403"
+            - generic [ref=e385]:
+              - generic [ref=e386]: "#06"
+              - generic [ref=e387]:
+                - text: MAGENTA88
+                - generic [ref=e388]: 26/02/2026
+              - generic [ref=e389]: "112.371"
+            - generic [ref=e390]:
+              - generic [ref=e391]: "#07"
+              - generic [ref=e392]:
+                - text: ATARI_KID
+                - generic [ref=e393]: 15/02/2026
+              - generic [ref=e394]: "101.972"
+            - generic [ref=e395]:
+              - generic [ref=e396]: "#08"
+              - generic [ref=e397]:
+                - text: NEONFOX
+                - generic [ref=e398]: 18/06/2026
+              - generic [ref=e399]: "68.355"
+            - generic [ref=e400]:
+              - generic [ref=e401]: "#09"
+              - generic [ref=e402]:
+                - text: VECTORX
+                - generic [ref=e403]: 13/10/2026
+              - generic [ref=e404]: "51.445"
+            - generic [ref=e405]:
+              - generic [ref=e406]: "#10"
+              - generic [ref=e407]:
+                - text: PIXEL_DAD
+                - generic [ref=e408]: 08/02/2026
+              - generic [ref=e409]: "36.364"
+  - button "Open Next.js Dev Tools" [ref=e138] [cursor=pointer]:
+    - img [ref=e139]
+  - alert [ref=e142]

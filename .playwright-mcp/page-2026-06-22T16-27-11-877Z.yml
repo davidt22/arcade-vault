@@ -1,0 +1,114 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "ARCADE VAULT" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: ARCADE VAULT
+      - generic [ref=e7]:
+        - link "Biblioteca" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "Salón de la Fama" [ref=e9] [cursor=pointer]:
+          - /url: /hall-of-fame
+      - generic [ref=e12]: CRÉDITOS · 03
+      - link "Iniciar Sesión" [ref=e13] [cursor=pointer]:
+        - /url: /auth
+    - complementary [ref=e14]:
+      - generic [ref=e15]: MENÚ
+      - link "Biblioteca" [ref=e16] [cursor=pointer]:
+        - /url: /
+      - link "Salón de la Fama" [ref=e17] [cursor=pointer]:
+        - /url: /hall-of-fame
+      - link "Iniciar Sesión" [ref=e18] [cursor=pointer]:
+        - /url: /auth
+      - generic [ref=e20]: CRÉDITOS · 03
+    - main [ref=e21]:
+      - generic [ref=e143]:
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - generic [ref=e149]: ARCADE
+            - generic [ref=e150]: 1 JUGADOR
+            - generic [ref=e151]: TECLADO / TÁCTIL
+            - generic [ref=e152]: RETRO 1985
+          - heading "BLOQUE BUSTER" [level=2] [ref=e153]
+          - paragraph [ref=e154]: Pilota una nave-paleta y rebota un núcleo de plasma para pulverizar muros de bloques cromáticos. Cada nivel reorganiza la grilla en patrones imposibles. ¿Hasta dónde llegará tu racha?
+          - generic [ref=e155]:
+            - generic [ref=e156]:
+              - generic [ref=e157]: Partidas
+              - generic [ref=e158]: 12.4K
+            - generic [ref=e159]:
+              - generic [ref=e160]: Mejor global
+              - generic [ref=e161]: "28.450"
+            - generic [ref=e162]:
+              - generic [ref=e163]: Dificultad
+              - generic [ref=e164]: ★ ★ ★ ☆ ☆
+          - generic [ref=e165]:
+            - link "▶ JUGAR AHORA" [ref=e166] [cursor=pointer]:
+              - /url: /game/bloque-buster/play
+            - link "VOLVER AL VAULT" [ref=e167] [cursor=pointer]:
+              - /url: /
+        - complementary [ref=e168]:
+          - generic [ref=e169]:
+            - heading "MEJORES PUNTUACIONES" [level=3] [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e172]: "#01"
+              - generic [ref=e173]:
+                - text: Z3R0COOL
+                - generic [ref=e174]: 26/10/2026
+              - generic [ref=e175]: "288.295"
+            - generic [ref=e176]:
+              - generic [ref=e177]: "#02"
+              - generic [ref=e178]:
+                - text: VAULT_07
+                - generic [ref=e179]: 26/07/2026
+              - generic [ref=e180]: "265.726"
+            - generic [ref=e181]:
+              - generic [ref=e182]: "#03"
+              - generic [ref=e183]:
+                - text: ARKADYA
+                - generic [ref=e184]: 03/08/2026
+              - generic [ref=e185]: "263.269"
+            - generic [ref=e186]:
+              - generic [ref=e187]: "#04"
+              - generic [ref=e188]:
+                - text: GLITCHA
+                - generic [ref=e189]: 10/08/2026
+              - generic [ref=e190]: "253.385"
+            - generic [ref=e191]:
+              - generic [ref=e192]: "#05"
+              - generic [ref=e193]:
+                - text: MAGENTA88
+                - generic [ref=e194]: 07/09/2026
+              - generic [ref=e195]: "197.855"
+            - generic [ref=e196]:
+              - generic [ref=e197]: "#06"
+              - generic [ref=e198]:
+                - text: NEONFOX
+                - generic [ref=e199]: 10/02/2026
+              - generic [ref=e200]: "147.679"
+            - generic [ref=e201]:
+              - generic [ref=e202]: "#07"
+              - generic [ref=e203]:
+                - text: RETROVIRA
+                - generic [ref=e204]: 17/12/2026
+              - generic [ref=e205]: "90.057"
+            - generic [ref=e206]:
+              - generic [ref=e207]: "#08"
+              - generic [ref=e208]:
+                - text: VECTORX
+                - generic [ref=e209]: 03/05/2026
+              - generic [ref=e210]: "77.325"
+            - generic [ref=e211]:
+              - generic [ref=e212]: "#09"
+              - generic [ref=e213]:
+                - text: M00NRYU
+                - generic [ref=e214]: 24/02/2026
+              - generic [ref=e215]: "66.441"
+            - generic [ref=e216]:
+              - generic [ref=e217]: "#10"
+              - generic [ref=e218]:
+                - text: ATARI_KID
+                - generic [ref=e219]: 15/12/2026
+              - generic [ref=e220]: "44.370"
+  - button "Open Next.js Dev Tools" [ref=e138] [cursor=pointer]:
+    - img [ref=e139]
+  - alert [ref=e142]

@@ -1,0 +1,114 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - link "ARCADE VAULT" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]: ARCADE VAULT
+      - generic [ref=e7]:
+        - link "Biblioteca" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "Salón de la Fama" [ref=e9] [cursor=pointer]:
+          - /url: /hall-of-fame
+      - generic [ref=e12]: CRÉDITOS · 03
+      - link "Iniciar Sesión" [ref=e13] [cursor=pointer]:
+        - /url: /auth
+    - complementary [ref=e14]:
+      - generic [ref=e15]: MENÚ
+      - link "Biblioteca" [ref=e16] [cursor=pointer]:
+        - /url: /
+      - link "Salón de la Fama" [ref=e17] [cursor=pointer]:
+        - /url: /hall-of-fame
+      - link "Iniciar Sesión" [ref=e18] [cursor=pointer]:
+        - /url: /auth
+      - generic [ref=e20]: CRÉDITOS · 03
+    - main [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]: PUZZLE
+            - generic [ref=e29]: 1 JUGADOR
+            - generic [ref=e30]: TECLADO / TÁCTIL
+            - generic [ref=e31]: RETRO 1985
+          - heading "CAÍDA" [level=2] [ref=e32]
+          - paragraph [ref=e33]: Piezas geométricas descienden desde la oscuridad. Rótalas, encástralas y limpia líneas para sobrevivir. La velocidad aumenta sin piedad cada 10 líneas.
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - generic [ref=e36]: Partidas
+              - generic [ref=e37]: 31.8K
+            - generic [ref=e38]:
+              - generic [ref=e39]: Mejor global
+              - generic [ref=e40]: "184.220"
+            - generic [ref=e41]:
+              - generic [ref=e42]: Dificultad
+              - generic [ref=e43]: ★ ★ ★ ☆ ☆
+          - generic [ref=e44]:
+            - link "▶ JUGAR AHORA" [ref=e45] [cursor=pointer]:
+              - /url: /game/caida/play
+            - link "VOLVER AL VAULT" [ref=e46] [cursor=pointer]:
+              - /url: /
+        - complementary [ref=e47]:
+          - generic [ref=e48]:
+            - heading "MEJORES PUNTUACIONES" [level=3] [ref=e49]
+            - generic [ref=e50]:
+              - generic [ref=e51]: "#01"
+              - generic [ref=e52]:
+                - text: ARKADYA
+                - generic [ref=e53]: 19/12/2026
+              - generic [ref=e54]: "278.417"
+            - generic [ref=e55]:
+              - generic [ref=e56]: "#02"
+              - generic [ref=e57]:
+                - text: MAGENTA88
+                - generic [ref=e58]: 14/11/2026
+              - generic [ref=e59]: "245.157"
+            - generic [ref=e60]:
+              - generic [ref=e61]: "#03"
+              - generic [ref=e62]:
+                - text: VECTORX
+                - generic [ref=e63]: 19/07/2026
+              - generic [ref=e64]: "179.637"
+            - generic [ref=e65]:
+              - generic [ref=e66]: "#04"
+              - generic [ref=e67]:
+                - text: NEONFOX
+                - generic [ref=e68]: 01/08/2026
+              - generic [ref=e69]: "177.844"
+            - generic [ref=e70]:
+              - generic [ref=e71]: "#05"
+              - generic [ref=e72]:
+                - text: DROID_X
+                - generic [ref=e73]: 19/02/2026
+              - generic [ref=e74]: "117.367"
+            - generic [ref=e75]:
+              - generic [ref=e76]: "#06"
+              - generic [ref=e77]:
+                - text: PIXEL_DAD
+                - generic [ref=e78]: 21/03/2026
+              - generic [ref=e79]: "95.046"
+            - generic [ref=e80]:
+              - generic [ref=e81]: "#07"
+              - generic [ref=e82]:
+                - text: BIT_LORD
+                - generic [ref=e83]: 01/03/2026
+              - generic [ref=e84]: "52.806"
+            - generic [ref=e85]:
+              - generic [ref=e86]: "#08"
+              - generic [ref=e87]:
+                - text: SCANLINE
+                - generic [ref=e88]: 14/03/2026
+              - generic [ref=e89]: "41.242"
+            - generic [ref=e90]:
+              - generic [ref=e91]: "#09"
+              - generic [ref=e92]:
+                - text: RGB_QUEEN
+                - generic [ref=e93]: 28/07/2026
+              - generic [ref=e94]: "39.706"
+            - generic [ref=e95]:
+              - generic [ref=e96]: "#10"
+              - generic [ref=e97]:
+                - text: M00NRYU
+                - generic [ref=e98]: 10/04/2026
+              - generic [ref=e99]: "21.307"
+  - button "Open Next.js Dev Tools" [ref=e105] [cursor=pointer]:
+    - img [ref=e106]
+  - alert [ref=e109]
