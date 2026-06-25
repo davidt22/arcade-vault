@@ -89,6 +89,17 @@ export const GAMES: Game[] = [
     plays: "6.4K",
   },
   {
+    id: "asteroids",
+    title: "ASTEROIDS",
+    short: "Destruye rocas espaciales antes de que te destruyan.",
+    long: "Tu nave triangular deriva en gravedad cero entre asteroides de todos los tamaños. Dispara para fragmentarlos y esquiva los restos. Los platillos voladores aparecerán para complicar tu supervivencia.",
+    cat: "SHOOTER",
+    cover: "cover-asteroids",
+    color: "cyan",
+    best: 38500,
+    plays: "10.2K",
+  },
+  {
     id: "duelo-pixel",
     title: "DUELO PIXEL",
     short: "Dos paletas. Una pelota. Reflejos máximos.",
