@@ -8,7 +8,7 @@ export default function Nav() {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
-    if (path === '/') return pathname === '/' || pathname.startsWith('/game');
+    if (path === '/games') return pathname === '/games' || pathname.startsWith('/game');
     return pathname.startsWith(path);
   };
 
@@ -22,7 +22,7 @@ export default function Nav() {
           </div>
         </Link>
         <div className="links">
-          <Link href="/" className={isActive('/') ? 'active' : ''}>Biblioteca</Link>
+          <Link href="/games" className={isActive('/games') ? 'active' : ''}>Juegos</Link>
           <Link href="/hall-of-fame" className={isActive('/hall-of-fame') ? 'active' : ''}>
             Salón de la Fama
           </Link>
@@ -48,8 +48,8 @@ export default function Nav() {
       />
       <aside className={"av-mobile-panel" + (open ? " open" : "")}>
         <div className="pixel neon-cyan" style={{ fontSize: 11, marginBottom: 16 }}>MENÚ</div>
-        <Link href="/" className={isActive('/') ? 'active' : ''} onClick={() => setOpen(false)}>
-          Biblioteca
+        <Link href="/games" className={isActive('/games') ? 'active' : ''} onClick={() => setOpen(false)}>
+          Juegos
         </Link>
         <Link
           href="/hall-of-fame"
