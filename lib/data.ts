@@ -89,6 +89,17 @@ export const GAMES: Game[] = [
     plays: "6.4K",
   },
   {
+    id: "tetris",
+    title: "TETRIS",
+    short: "Rota y encaja las 7 piezas antes de que el techo te aplaste.",
+    long: "Siete tetrominós descienden desde la oscuridad. Rótalos, encástralos y limpia líneas para sobrevivir. La velocidad aumenta sin piedad cada 10 líneas. Piezas especiales complican el tablero.",
+    cat: "PUZZLE",
+    cover: "cover-tetris",
+    color: "cyan",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "asteroids",
     title: "ASTEROIDS",
     short: "Destruye rocas espaciales antes de que te destruyan.",
