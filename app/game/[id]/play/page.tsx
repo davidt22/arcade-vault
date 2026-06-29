@@ -156,6 +156,160 @@ function AsteroidsGame() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Tetris — canvas real + overlay React
+// ─────────────────────────────────────────────────────────────────────────────
+function TetrisGame() {
+  const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [gameState, setGameState] = useState<'playing' | 'gameover'>('playing');
+  const [sessionMsg, setSessionMsg] = useState<string | null>(null);
+
+  const levelRef = useRef(1);
+  const scoreSavedRef = useRef(false);
+
+  useEffect(() => {
+    if (!document.querySelector('script[src*="tetris/game.js"]')) {
+      const script = document.createElement('script');
+      script.src = '/games/tetris/game.js';
+      document.body.appendChild(script);
+    }
+
+    const onScore = (e: Event) =>
+      setScore((e as CustomEvent<{ score: number }>).detail.score);
+
+    const onLevel = (e: Event) => {
+      const lv = (e as CustomEvent<{ level: number }>).detail.level;
+      setLevel(lv);
+      levelRef.current = lv;
+    };
+
+    const onState = (e: Event) => {
+      const { state, score: finalScore } = (
+        e as CustomEvent<{ state: 'playing' | 'gameover'; score: number }>
+      ).detail;
+
+      setGameState(state);
+
+      if (state === 'playing') {
+        scoreSavedRef.current = false;
+        setSessionMsg(null);
+      }
+
+      if (state === 'gameover' && !scoreSavedRef.current) {
+        scoreSavedRef.current = true;
+        fetch('/api/scores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_id: 'tetris',
+            score: finalScore,
+            level: levelRef.current,
+          }),
+        }).then((res) => {
+          if (res.status === 401) setSessionMsg('Inicia sesión para guardar tu puntaje');
+        });
+      }
+    };
+
+    window.addEventListener('tetris:score', onScore);
+    window.addEventListener('tetris:level', onLevel);
+    window.addEventListener('tetris:state', onState);
+
+    return () => {
+      window.removeEventListener('tetris:score', onScore);
+      window.removeEventListener('tetris:level', onLevel);
+      window.removeEventListener('tetris:state', onState);
+      (window as Window & { destroyTetris?: () => void }).destroyTetris?.();
+    };
+  }, []);
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#000',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 32,
+      }}
+    >
+      {/* Elementos DOM ocultos que game.js necesita para no crashear */}
+      <span id="score" style={{ display: 'none' }} />
+      <span id="lines" style={{ display: 'none' }} />
+      <span id="level" style={{ display: 'none' }} />
+      <div id="overlay" style={{ display: 'none' }}>
+        <span id="overlay-title" />
+        <span id="overlay-score" />
+        <button id="restart-btn" type="button" />
+      </div>
+
+      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+        {/* Canvas principal del tablero 300×600 */}
+        <canvas
+          id="board"
+          width={300}
+          height={600}
+          style={{ display: 'block', border: '1px solid rgba(77,208,225,0.25)' }}
+        />
+
+        {/* Sidebar: preview pieza siguiente + HUD React */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 8 }}>
+          <div>
+            <div
+              className="pixel"
+              style={{ fontSize: 8, color: 'var(--ink-dim)', letterSpacing: '0.2em', marginBottom: 8 }}
+            >
+              SIGUIENTE
+            </div>
+            <canvas
+              id="next-canvas"
+              width={120}
+              height={120}
+              style={{ display: 'block', border: '1px solid rgba(77,208,225,0.15)', background: '#000' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="hud-stat">
+              <div className="l">Puntuación</div>
+              <div className="v">{score.toLocaleString('es-ES')}</div>
+            </div>
+            <div className="hud-stat level">
+              <div className="l">Nivel</div>
+              <div className="v">{String(level).padStart(2, '0')}</div>
+            </div>
+            {gameState === 'gameover' && (
+              <div
+                className="pixel neon-magenta"
+                style={{ fontSize: 11, letterSpacing: '0.14em', marginTop: 6 }}
+              >
+                GAME OVER
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {sessionMsg && (
+        <p
+          style={{
+            marginTop: 20,
+            fontFamily: 'var(--mono)',
+            fontSize: 13,
+            color: 'var(--ink-dim)',
+            letterSpacing: '0.08em',
+          }}
+        >
+          {sessionMsg}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Mock player — juegos sin implementación real aún
 // ─────────────────────────────────────────────────────────────────────────────
 function MockPlayer({ game }: { game: (typeof GAMES)[number] }) {
@@ -329,5 +483,6 @@ export default function GamePlayerPage({
   }
 
   if (id === 'asteroids') return <AsteroidsGame />;
+  if (id === 'tetris') return <TetrisGame />;
   return <MockPlayer game={game} />;
 }
