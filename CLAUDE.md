@@ -9,6 +9,8 @@ No hay suite de tests configurada.
 ## Skills
 Usa siempre /frontend-design para diseñar el interfaz del usuario.
 
+Usar el skill `/game-planner` para decidir qué juego integrar a continuación. Mantiene el historial de sugerencias en `references/game-suggestions-todo.md`.
+
 ## Arquitectura
 
 **Arcade Vault** es una plataforma retro de juegos arcade online con clasificaciones competitivas.
@@ -62,7 +64,7 @@ Establecido en spec-04 (Asteroids). Cada juego sigue este patrón:
 
 Ver lista completa de juegos cuando lo necesites y su estado de implementación en `references/implemented-games.md`.
 
-Usar el skill `/add-game` para integrar un juego nuevo.
+Usar `/game-planner` para decidir qué juego integrar y `/add-game` para implementarlo.
 
 ### CSS del template
 `resources/templates/styles.css` define el design system retro con variables CSS (`--ink`, `--neon-cyan`, `--neon-magenta`, etc.) y clases `av-*`. Estas deben integrarse en `globals.css` o como módulos CSS al portar las pantallas.
