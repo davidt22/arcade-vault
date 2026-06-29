@@ -100,6 +100,17 @@ export const GAMES: Game[] = [
     plays: "0",
   },
   {
+    id: "arkanoid",
+    title: "ARKANOID",
+    short: "Destroza bloques con la paleta en 5 niveles neon.",
+    long: "Maneja la paleta y rebota la pelota para pulverizar bloques cromáticos. Cinco niveles con patrones únicos y velocidad creciente. Tres vidas para completar el desafío.",
+    cat: "ARCADE",
+    cover: "cover-arkanoid",
+    color: "cyan",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "asteroids",
     title: "ASTEROIDS",
     short: "Destruye rocas espaciales antes de que te destruyan.",
