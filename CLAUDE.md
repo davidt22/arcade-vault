@@ -11,6 +11,8 @@ Usa siempre /frontend-design para diseñar el interfaz del usuario.
 
 Usar el skill `/game-planner` para decidir qué juego integrar a continuación. Mantiene el historial de sugerencias en `references/game-suggestions-todo.md`.
 
+Usar `/skin-designer [<game-id>]` para auditar y crear las 3 skins requeridas (classic, neon, retro) en cada juego. Sin argumento audita todos; con argumento audita solo ese juego.
+
 ## Arquitectura
 
 **Arcade Vault** es una plataforma retro de juegos arcade online con clasificaciones competitivas.
