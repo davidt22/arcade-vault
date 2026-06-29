@@ -156,6 +156,151 @@ function AsteroidsGame() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Arkanoid — canvas real + overlay React
+// ─────────────────────────────────────────────────────────────────────────────
+function ArkanoidGame() {
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [level, setLevel] = useState(1);
+  const [gameState, setGameState] = useState<'playing' | 'dead' | 'gameover'>('playing');
+  const [sessionMsg, setSessionMsg] = useState<string | null>(null);
+
+  const levelRef = useRef(1);
+  const scoreSavedRef = useRef(false);
+
+  useEffect(() => {
+    if (!document.querySelector('script[src*="arkanoid/game.js"]')) {
+      const script = document.createElement('script');
+      script.src = '/games/arkanoid/game.js';
+      document.body.appendChild(script);
+    }
+
+    const onScore = (e: Event) =>
+      setScore((e as CustomEvent<{ score: number }>).detail.score);
+
+    const onLives = (e: Event) =>
+      setLives((e as CustomEvent<{ lives: number }>).detail.lives);
+
+    const onLevel = (e: Event) => {
+      const lv = (e as CustomEvent<{ level: number }>).detail.level;
+      setLevel(lv);
+      levelRef.current = lv;
+    };
+
+    const onState = (e: Event) => {
+      const { state, score: finalScore } = (
+        e as CustomEvent<{ state: 'playing' | 'dead' | 'gameover'; score: number }>
+      ).detail;
+
+      setGameState(state);
+
+      if (state === 'playing') {
+        scoreSavedRef.current = false;
+        setSessionMsg(null);
+      }
+
+      if (state === 'gameover' && !scoreSavedRef.current) {
+        scoreSavedRef.current = true;
+        fetch('/api/scores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game_id: 'arkanoid',
+            score: finalScore,
+            level: levelRef.current,
+          }),
+        }).then((res) => {
+          if (res.status === 401) setSessionMsg('Inicia sesión para guardar tu puntaje');
+        });
+      }
+    };
+
+    window.addEventListener('arkanoid:score', onScore);
+    window.addEventListener('arkanoid:lives', onLives);
+    window.addEventListener('arkanoid:level', onLevel);
+    window.addEventListener('arkanoid:state', onState);
+
+    return () => {
+      window.removeEventListener('arkanoid:score', onScore);
+      window.removeEventListener('arkanoid:lives', onLives);
+      window.removeEventListener('arkanoid:level', onLevel);
+      window.removeEventListener('arkanoid:state', onState);
+      (window as Window & { destroyArkanoid?: () => void }).destroyArkanoid?.();
+    };
+  }, []);
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#000',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 32,
+      }}
+    >
+      <div style={{ position: 'relative', width: 800, maxWidth: '100%' }}>
+        <canvas
+          id="game"
+          width={800}
+          height={600}
+          style={{ display: 'block', width: '100%' }}
+        />
+
+        {/* Overlay React — flotante sobre el canvas */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 40,
+            right: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 10,
+            padding: '10px 16px',
+            pointerEvents: 'none',
+          }}
+        >
+          <div className="hud-stat">
+            <div className="l">Puntuación</div>
+            <div className="v">{score.toLocaleString('es-ES')}</div>
+          </div>
+          <div className="hud-stat lives">
+            <div className="l">Vidas</div>
+            <div className="v">
+              {lives > 0 ? '♥ '.repeat(lives).trim() : '—'}
+            </div>
+          </div>
+          <div className="hud-stat level">
+            <div className="l">Nivel</div>
+            <div className="v">{String(level).padStart(2, '0')}</div>
+          </div>
+          {gameState === 'gameover' && (
+            <div
+              className="pixel neon-magenta"
+              style={{ fontSize: 11, letterSpacing: '0.14em', marginTop: 6 }}
+            >
+              GAME OVER
+            </div>
+          )}
+        </div>
+      </div>
+
+      {sessionMsg && (
+        <p
+          className="pixel neon-cyan"
+          style={{ fontSize: 9, marginTop: 16, letterSpacing: '0.1em' }}
+        >
+          {sessionMsg}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Tetris — canvas real + overlay React
 // ─────────────────────────────────────────────────────────────────────────────
 function TetrisGame() {
@@ -482,6 +627,7 @@ export default function GamePlayerPage({
     return null;
   }
 
+  if (id === 'arkanoid') return <ArkanoidGame />;
   if (id === 'asteroids') return <AsteroidsGame />;
   if (id === 'tetris') return <TetrisGame />;
   return <MockPlayer game={game} />;
