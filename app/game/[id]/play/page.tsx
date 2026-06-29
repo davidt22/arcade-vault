@@ -3,10 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
-import { GAMES } from '@/lib/data';
+import { GAMES, type Skin } from '@/lib/data';
+
+const SKIN_CANVAS_FILTER: Record<string, string> = {
+  classic: 'none',
+  neon: 'saturate(2) brightness(1.15) contrast(1.1)',
+  retro: 'hue-rotate(290deg) brightness(0.85) saturate(0.85)',
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Asteroids — canvas real + overlay React
+// Asteroids — selector de skin + canvas + overlay React
 // ─────────────────────────────────────────────────────────────────────────────
 function AsteroidsGame() {
   const [score, setScore] = useState(0);
@@ -14,9 +20,23 @@ function AsteroidsGame() {
   const [level, setLevel] = useState(1);
   const [gameState, setGameState] = useState<'playing' | 'dead' | 'gameover'>('playing');
   const [sessionMsg, setSessionMsg] = useState<string | null>(null);
+  const [skinId, setSkinId] = useState<'classic' | 'neon' | 'retro'>('classic');
 
   const levelRef = useRef(1);
   const scoreSavedRef = useRef(false);
+
+  const skins: Skin[] = GAMES.find((g) => g.id === 'asteroids')?.skins ?? [];
+  const skin = skins.find((s) => s.id === skinId) ?? skins[0];
+
+  useEffect(() => {
+    const saved = localStorage.getItem('asteroids-skin') as 'classic' | 'neon' | 'retro' | null;
+    if (saved && ['classic', 'neon', 'retro'].includes(saved)) setSkinId(saved);
+  }, []);
+
+  const handleSkinChange = (id: 'classic' | 'neon' | 'retro') => {
+    setSkinId(id);
+    localStorage.setItem('asteroids-skin', id);
+  };
 
   useEffect(() => {
     if (!document.querySelector('script[src*="asteroids/game.js"]')) {
@@ -79,16 +99,19 @@ function AsteroidsGame() {
     };
   }, []);
 
+  const p = skin?.palette;
+
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: '#000',
+        background: p?.bg ?? '#000',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         paddingBottom: 32,
+        transition: 'background 0.4s ease',
       }}
     >
       <div style={{ position: 'relative', width: 800, maxWidth: '100%' }}>
@@ -96,10 +119,15 @@ function AsteroidsGame() {
           id="canvas"
           width={800}
           height={600}
-          style={{ display: 'block', width: '100%' }}
+          style={{
+            display: 'block',
+            width: '100%',
+            filter: SKIN_CANVAS_FILTER[skinId] ?? 'none',
+            transition: 'filter 0.35s ease',
+          }}
         />
 
-        {/* Overlay React — flotante sobre el canvas */}
+        {/* Overlay HUD — flotante sobre el canvas */}
         <div
           style={{
             position: 'absolute',
@@ -115,22 +143,41 @@ function AsteroidsGame() {
         >
           <div className="hud-stat">
             <div className="l">Puntuación</div>
-            <div className="v">{score.toLocaleString('es-ES')}</div>
+            <div
+              className="v"
+              style={{ color: p?.primary, textShadow: `0 0 8px ${p?.primary}99` }}
+            >
+              {score.toLocaleString('es-ES')}
+            </div>
           </div>
-          <div className="hud-stat lives">
+          <div className="hud-stat">
             <div className="l">Vidas</div>
-            <div className="v">
+            <div
+              className="v"
+              style={{ color: p?.accent, textShadow: `0 0 8px ${p?.accent}99` }}
+            >
               {lives > 0 ? '♥ '.repeat(lives).trim() : '—'}
             </div>
           </div>
-          <div className="hud-stat level">
+          <div className="hud-stat">
             <div className="l">Nivel</div>
-            <div className="v">{String(level).padStart(2, '0')}</div>
+            <div
+              className="v"
+              style={{ color: p?.primary, textShadow: `0 0 8px ${p?.primary}66` }}
+            >
+              {String(level).padStart(2, '0')}
+            </div>
           </div>
           {gameState === 'gameover' && (
             <div
-              className="pixel neon-magenta"
-              style={{ fontSize: 11, letterSpacing: '0.14em', marginTop: 6 }}
+              className="pixel"
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.14em',
+                marginTop: 6,
+                color: p?.accent,
+                textShadow: `0 0 8px ${p?.accent}cc`,
+              }}
             >
               GAME OVER
             </div>
@@ -138,14 +185,96 @@ function AsteroidsGame() {
         </div>
       </div>
 
+      {/* Selector de skin */}
+      {skins.length > 0 && (
+        <div
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--mono)',
+              fontSize: 9,
+              letterSpacing: '0.2em',
+              color: '#444',
+              textTransform: 'uppercase',
+              marginRight: 6,
+            }}
+          >
+            SKIN
+          </span>
+          {skins.map((s) => {
+            const active = s.id === skinId;
+            return (
+              <button
+                key={s.id}
+                onClick={() => handleSkinChange(s.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  padding: '5px 13px 5px 9px',
+                  background: active ? `${s.palette.primary}14` : 'transparent',
+                  border: `1px solid ${active ? s.palette.primary : '#2a2a3a'}`,
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: active ? `0 0 10px ${s.palette.primary}44` : 'none',
+                }}
+              >
+                {/* Dos puntos de color: primary + accent */}
+                <span style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: s.palette.primary,
+                      boxShadow: active ? `0 0 6px ${s.palette.primary}` : 'none',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: s.palette.accent,
+                      boxShadow: active ? `0 0 6px ${s.palette.accent}` : 'none',
+                      flexShrink: 0,
+                    }}
+                  />
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--pixel)',
+                    fontSize: 8,
+                    letterSpacing: '0.15em',
+                    color: active ? s.palette.primary : '#444',
+                    transition: 'color 0.2s ease',
+                  }}
+                >
+                  {s.label.toUpperCase()}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {sessionMsg && (
         <p
           style={{
-            marginTop: 20,
+            marginTop: 16,
             fontFamily: 'var(--mono)',
             fontSize: 13,
-            color: 'var(--ink-dim)',
+            color: p?.primary ?? 'var(--ink-dim)',
             letterSpacing: '0.08em',
+            opacity: 0.7,
           }}
         >
           {sessionMsg}

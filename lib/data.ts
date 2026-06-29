@@ -1,3 +1,14 @@
+export type Skin = {
+  id: 'classic' | 'neon' | 'retro';
+  label: string;
+  palette: {
+    bg: string;
+    primary: string;
+    accent: string;
+    text: string;
+  };
+};
+
 export type Game = {
   id: string;
   title: string;
@@ -8,6 +19,7 @@ export type Game = {
   color: string;
   best: number;
   plays: string;
+  skins?: Skin[];
 };
 
 export const GAMES: Game[] = [
@@ -21,6 +33,11 @@ export const GAMES: Game[] = [
     color: "cyan",
     best: 28450,
     plays: "12.4K",
+    skins: [
+      { id: 'classic', label: 'Clásico', palette: { bg: '#000000', primary: '#00FFFF', accent: '#00FFFF', text: '#FFFFFF' } },
+      { id: 'neon',    label: 'Neón',    palette: { bg: '#050510', primary: '#00FFFF', accent: '#FF00FF', text: '#00FFFF' } },
+      { id: 'retro',   label: 'Retro',   palette: { bg: '#0A0A04', primary: '#33FF00', accent: '#FF8800', text: '#33FF00' } },
+    ],
   },
   {
     id: "caida",
@@ -32,6 +49,11 @@ export const GAMES: Game[] = [
     color: "magenta",
     best: 184220,
     plays: "31.8K",
+    skins: [
+      { id: 'classic', label: 'Clásico', palette: { bg: '#000000', primary: '#FF00FF', accent: '#FF00FF', text: '#FFFFFF' } },
+      { id: 'neon',    label: 'Neón',    palette: { bg: '#050510', primary: '#00FFFF', accent: '#FF00FF', text: '#00FFFF' } },
+      { id: 'retro',   label: 'Retro',   palette: { bg: '#0A0A04', primary: '#33FF00', accent: '#FF8800', text: '#33FF00' } },
+    ],
   },
   {
     id: "serpentina",
@@ -120,6 +142,11 @@ export const GAMES: Game[] = [
     color: "cyan",
     best: 38500,
     plays: "10.2K",
+    skins: [
+      { id: 'classic', label: 'Clásico', palette: { bg: '#000000', primary: '#00FFFF', accent: '#00FFFF', text: '#FFFFFF' } },
+      { id: 'neon',    label: 'Neón',    palette: { bg: '#050510', primary: '#00FFFF', accent: '#FF00FF', text: '#00FFFF' } },
+      { id: 'retro',   label: 'Retro',   palette: { bg: '#0A0A04', primary: '#33FF00', accent: '#FF8800', text: '#33FF00' } },
+    ],
   },
   {
     id: "duelo-pixel",
