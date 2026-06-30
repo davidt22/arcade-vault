@@ -49,8 +49,23 @@ interface Frog {
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
+export interface FroggerPalette {
+  bg: string;
+  primary: string;
+  accent: string;
+  text: string;
+}
+
+const DEFAULT_PALETTE: FroggerPalette = {
+  bg: '#111111',
+  primary: '#33cc33',
+  accent: '#e63946',
+  text: '#ffffff',
+};
+
 export interface FroggerGameProps {
   paused: boolean;
+  palette?: FroggerPalette;
   onScoreChange: (score: number) => void;
   onLivesChange: (lives: number) => void;
   onLevelChange: (level: number) => void;
@@ -62,13 +77,13 @@ function buildLanes(level: number): Lane[] {
   const speedMultiplier = Math.pow(1.15, level - 1);
   const lanes: Lane[] = [];
 
-  // Carriles de carretera (filas 8–12, de abajo a arriba)
+  // Carriles de carretera (filas 8–12, de abajo a arriba) — velocidades en celdas/segundo
   const roadConfigs: Array<{ row: number; speed: number; dir: 1 | -1; type: 'car' | 'truck'; widths: number[] }> = [
-    { row: 12, speed: 1.8, dir:  1, type: 'car',   widths: [1, 1, 2, 1] },
-    { row: 11, speed: 2.2, dir: -1, type: 'truck',  widths: [2, 1, 2]    },
-    { row: 10, speed: 3.0, dir:  1, type: 'car',   widths: [1, 2, 1, 1] },
-    { row:  9, speed: 2.5, dir: -1, type: 'car',   widths: [1, 1, 3, 1] },
-    { row:  8, speed: 3.5, dir:  1, type: 'truck',  widths: [3, 2]       },
+    { row: 12, speed: 2.0, dir:  1, type: 'car',   widths: [1, 1, 2, 1] },
+    { row: 11, speed: 2.5, dir: -1, type: 'truck',  widths: [2, 1, 2]    },
+    { row: 10, speed: 3.2, dir:  1, type: 'car',   widths: [1, 2, 1, 1] },
+    { row:  9, speed: 2.8, dir: -1, type: 'car',   widths: [1, 1, 3, 1] },
+    { row:  8, speed: 4.0, dir:  1, type: 'truck',  widths: [3, 2]       },
   ];
 
   for (const cfg of roadConfigs) {
@@ -81,14 +96,14 @@ function buildLanes(level: number): Lane[] {
     lanes.push({ row: cfg.row, speed: cfg.speed * speedMultiplier, dir: cfg.dir, entities });
   }
 
-  // Carriles de río (filas 1–6, de abajo a arriba)
+  // Carriles de río (filas 1–6, de abajo a arriba) — velocidades en celdas/segundo
   const riverConfigs: Array<{ row: number; speed: number; dir: 1 | -1; type: 'log' | 'turtle'; widths: number[] }> = [
-    { row: 6, speed: 1.2, dir:  1, type: 'log',    widths: [3, 4, 2]    },
-    { row: 5, speed: 2.0, dir: -1, type: 'turtle', widths: [2, 3, 2]    },
-    { row: 4, speed: 1.5, dir:  1, type: 'log',    widths: [4, 2, 3]    },
+    { row: 6, speed: 1.5, dir:  1, type: 'log',    widths: [3, 4, 2]    },
+    { row: 5, speed: 2.2, dir: -1, type: 'turtle', widths: [2, 3, 2]    },
+    { row: 4, speed: 1.8, dir:  1, type: 'log',    widths: [4, 2, 3]    },
     { row: 3, speed: 2.5, dir: -1, type: 'turtle', widths: [3, 2]       },
-    { row: 2, speed: 1.0, dir:  1, type: 'log',    widths: [2, 4, 2, 3] },
-    { row: 1, speed: 3.0, dir: -1, type: 'turtle', widths: [2, 3]       },
+    { row: 2, speed: 1.2, dir:  1, type: 'log',    widths: [2, 4, 2, 3] },
+    { row: 1, speed: 2.8, dir: -1, type: 'turtle', widths: [2, 3]       },
   ];
 
   for (const cfg of riverConfigs) {
@@ -113,12 +128,16 @@ function buildLanes(level: number): Lane[] {
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function FroggerGame({
   paused,
+  palette = DEFAULT_PALETTE,
   onScoreChange,
   onLivesChange,
   onLevelChange,
   onGameOver,
 }: FroggerGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const paletteRef = useRef(palette);
+  useEffect(() => { paletteRef.current = palette; }, [palette]);
+
   const stateRef = useRef({
     paused,
     lives: 3,
@@ -252,10 +271,10 @@ export default function FroggerGame({
       if (s.paused) return;
       const f = s.frog;
 
-      // Avanzar entidades
+      // Avanzar entidades — velocidad en celdas/segundo, dt en ms
       for (const lane of s.lanes) {
         for (const ent of lane.entities) {
-          ent.col += lane.speed * lane.dir * dt / 16;
+          ent.col += lane.speed * lane.dir * dt / 1000;
           if (lane.dir === 1 && ent.col > COLS) ent.col = -ent.width;
           if (lane.dir === -1 && ent.col < -ent.width) ent.col = COLS;
 
@@ -283,12 +302,12 @@ export default function FroggerGame({
 
       // Movimiento de la rana
       if (!f.animating) {
-        // Arrastre del río
+        // Arrastre del río — igual que las entidades
         if (f.row >= ROW_RIVER_TOP && f.row <= ROW_RIVER_BOT) {
           const sup = getSupport();
           if (!sup) { killFrog(); return; }
           const lane = s.lanes.find((l) => l.row === f.row)!;
-          f.col += lane.speed * lane.dir * dt / 16 / CELL;
+          f.col += lane.speed * lane.dir * dt / 1000;
           if (f.col < 0 || f.col >= COLS) { killFrog(); return; }
         }
 
@@ -333,17 +352,20 @@ export default function FroggerGame({
     function draw() {
       ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
       const f = s.frog;
+      const p = paletteRef.current;
 
       // Fondo por zonas
       for (let r = 0; r < ROWS; r++) {
         if (r === ROW_GOALS) {
-          ctx.fillStyle = '#1a3a1a';
+          ctx.fillStyle = p.bg + '66';
+          ctx.fillRect(0, r * CELL, CANVAS_W, CELL);
+          ctx.fillStyle = p.primary + '18';
         } else if (r >= ROW_RIVER_TOP && r <= ROW_RIVER_BOT) {
-          ctx.fillStyle = '#001f3f';
+          ctx.fillStyle = '#001a33';
         } else if (r === ROW_SAFE_MID || r === ROW_START) {
-          ctx.fillStyle = '#0d2b0d';
+          ctx.fillStyle = p.bg + 'cc';
         } else {
-          ctx.fillStyle = '#111';
+          ctx.fillStyle = p.bg;
         }
         ctx.fillRect(0, r * CELL, CANVAS_W, CELL);
       }
@@ -352,14 +374,13 @@ export default function FroggerGame({
       const goalCols = [1, 4, 7, 10, 13];
       for (let i = 0; i < 5; i++) {
         const x = goalCols[i] * CELL;
-        ctx.fillStyle = s.goals[i] ? '#2d7a2d' : '#0a200a';
+        ctx.fillStyle = s.goals[i] ? p.primary + '44' : '#000000aa';
         ctx.fillRect(x, 0, CELL * 2, CELL);
-        ctx.strokeStyle = '#c8a000';
+        ctx.strokeStyle = p.accent + 'aa';
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 1, 1, CELL * 2 - 2, CELL - 2);
         if (s.goals[i]) {
-          // Silueta de rana en la boca ocupada
-          ctx.fillStyle = '#33cc33';
+          ctx.fillStyle = p.primary;
           ctx.beginPath();
           ctx.ellipse(x + CELL, CELL / 2, 10, 8, 0, 0, Math.PI * 2);
           ctx.fill();
@@ -373,40 +394,41 @@ export default function FroggerGame({
           const x = ent.col * CELL;
           const w = ent.width * CELL;
           if (ent.type === 'car') {
-            const colors = ['#e63946', '#f4d03f', '#2980b9'];
-            ctx.fillStyle = colors[lane.row % colors.length];
+            // Variaciones de color del coche según carril
+            const shade = ['', 'bb', '88'][lane.row % 3];
+            ctx.fillStyle = p.accent + shade;
             ctx.fillRect(x + 2, y + 8, w - 4, CELL - 16);
-            // Ruedas
             ctx.fillStyle = '#111';
             ctx.beginPath(); ctx.arc(x + 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(x + w - 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
           } else if (ent.type === 'truck') {
-            ctx.fillStyle = '#7f8c8d';
+            ctx.fillStyle = p.accent + '55';
             ctx.fillRect(x + 2, y + 6, w - 4, CELL - 12);
-            ctx.fillStyle = '#566573';
+            ctx.fillStyle = p.accent + '33';
             ctx.fillRect(x + 2, y + 6, CELL - 4, CELL - 12);
             ctx.fillStyle = '#111';
             ctx.beginPath(); ctx.arc(x + 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(x + w - 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
           } else if (ent.type === 'log') {
-            ctx.fillStyle = '#8B4513';
+            ctx.fillStyle = '#7a3b10';
             ctx.fillRect(x + 1, y + 6, w - 2, CELL - 12);
-            ctx.strokeStyle = '#6B3410';
+            ctx.strokeStyle = '#5a2b08';
             ctx.lineWidth = 1;
             for (let lx = x + 8; lx < x + w; lx += 12) {
               ctx.beginPath(); ctx.moveTo(lx, y + 6); ctx.lineTo(lx, y + CELL - 6); ctx.stroke();
             }
+            // Tono de piel de la paleta en la corteza
+            ctx.fillStyle = p.primary + '22';
+            ctx.fillRect(x + 1, y + 6, w - 2, CELL - 12);
           } else if (ent.type === 'turtle') {
-            if (ent.submerged) {
-              ctx.globalAlpha = 0.3;
-            }
+            if (ent.submerged) ctx.globalAlpha = 0.3;
             for (let ti = 0; ti < ent.width; ti++) {
               const tx = x + ti * CELL;
-              ctx.fillStyle = '#27ae60';
+              ctx.fillStyle = p.primary + 'bb';
               ctx.beginPath();
               ctx.ellipse(tx + CELL / 2, y + CELL / 2, 16, 14, 0, 0, Math.PI * 2);
               ctx.fill();
-              ctx.strokeStyle = '#1e8449';
+              ctx.strokeStyle = p.primary + '66';
               ctx.lineWidth = 1;
               ctx.beginPath();
               ctx.moveTo(tx + CELL / 2 - 8, y + CELL / 2);
@@ -426,7 +448,7 @@ export default function FroggerGame({
       const fy = (f.animating ? f.fromRow + (f.targetRow - f.fromRow) * prog : f.row) * CELL + CELL / 2;
       const jumpArc = f.animating ? Math.sin(prog * Math.PI) * 6 : 0;
 
-      ctx.fillStyle = '#33cc33';
+      ctx.fillStyle = p.primary;
       ctx.beginPath();
       ctx.ellipse(fx, fy - jumpArc, 14, 12, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -437,31 +459,30 @@ export default function FroggerGame({
       ctx.fillStyle = '#000';
       ctx.beginPath(); ctx.arc(fx - 5, fy - jumpArc - 5, 2, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.arc(fx + 5, fy - jumpArc - 5, 2, 0, Math.PI * 2); ctx.fill();
-      // Patas durante salto
       if (f.animating) {
-        ctx.strokeStyle = '#33cc33';
+        ctx.strokeStyle = p.primary;
         ctx.lineWidth = 3;
         ctx.beginPath(); ctx.moveTo(fx - 14, fy - jumpArc); ctx.lineTo(fx - 20, fy - jumpArc + 6); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(fx + 14, fy - jumpArc); ctx.lineTo(fx + 20, fy - jumpArc + 6); ctx.stroke();
       }
 
-      // HUD interno del canvas
+      // HUD interno — barra de tiempo
       const timerRatio = s.roundTimer / Math.max(5000, 15000 - (s.level - 1) * 1000);
-      const barColor = timerRatio > 0.5 ? '#33cc33' : timerRatio > 0.25 ? '#f1c40f' : '#e74c3c';
+      const barColor = timerRatio > 0.5 ? p.primary : timerRatio > 0.25 ? '#f1c40f' : p.accent;
       ctx.fillStyle = '#111';
       ctx.fillRect(0, 0, CANVAS_W, 6);
       ctx.fillStyle = barColor;
       ctx.fillRect(0, 0, CANVAS_W * timerRatio, 6);
 
       ctx.font = 'bold 14px monospace';
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = p.text;
       ctx.textAlign = 'left';
       ctx.fillText(`SCORE ${s.score}`, 6, CELL - 8);
       ctx.textAlign = 'center';
       ctx.fillText(`LV ${String(s.level).padStart(2, '0')}`, CANVAS_W / 2, CELL - 8);
       ctx.textAlign = 'right';
       for (let i = 0; i < s.lives; i++) {
-        ctx.fillStyle = '#33cc33';
+        ctx.fillStyle = p.primary;
         ctx.beginPath();
         ctx.arc(CANVAS_W - 12 - i * 22, CELL - 12, 7, 0, Math.PI * 2);
         ctx.fill();

@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
 import { TouchControls } from '@/components/TouchControls';
+import { GAMES, type Skin } from '@/lib/data';
 
 function useIsPortrait() {
   const [portrait, setPortrait] = useState(false);
@@ -21,6 +22,9 @@ const CANVAS_H = 560;
 
 const FroggerGame = dynamic(() => import('@/components/games/FroggerGame'), { ssr: false });
 
+const VALID_SKINS = ['classic', 'neon', 'retro'] as const;
+type SkinId = typeof VALID_SKINS[number];
+
 export default function FroggerPlayPage() {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -33,12 +37,27 @@ export default function FroggerPlayPage() {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [gameKey, setGameKey] = useState(0);
+  const [skinId, setSkinId] = useState<SkinId>('classic');
 
   const finalScoreRef = useRef(0);
   const finalLevelRef = useRef(1);
 
   const scale = useCanvasScale(CANVAS_W, CANVAS_H);
   const portrait = useIsPortrait();
+
+  const skins: Skin[] = GAMES.find((g) => g.id === 'frogger')?.skins ?? [];
+  const skin = skins.find((s) => s.id === skinId) ?? skins[0];
+  const p = skin?.palette;
+
+  useEffect(() => {
+    const saved = localStorage.getItem('frogger-skin') as SkinId | null;
+    if (saved && VALID_SKINS.includes(saved)) setSkinId(saved);
+  }, []);
+
+  const handleSkinChange = (id: SkinId) => {
+    setSkinId(id);
+    localStorage.setItem('frogger-skin', id);
+  };
 
   const handleScoreChange = useCallback((s: number) => setScore(s), []);
   const handleLivesChange = useCallback((l: number) => setLives(l), []);
@@ -84,7 +103,7 @@ export default function FroggerPlayPage() {
   if (portrait) return (
     <div style={{
       minHeight: '100vh',
-      background: '#000',
+      background: p?.bg ?? '#000',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -102,12 +121,13 @@ export default function FroggerPlayPage() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#000',
+        background: p?.bg ?? '#000',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         paddingBottom: 32,
+        transition: 'background 0.4s ease',
       }}
     >
       {/* HUD React de la plataforma */}
@@ -124,23 +144,27 @@ export default function FroggerPlayPage() {
         <div style={{ display: 'flex', gap: 24 }}>
           <div className="hud-stat">
             <div className="l">Puntuación</div>
-            <div className="v" style={{ color: '#33cc33' }}>{score.toLocaleString('es-ES')}</div>
+            <div className="v" style={{ color: p?.primary, textShadow: `0 0 8px ${p?.primary}99` }}>
+              {score.toLocaleString('es-ES')}
+            </div>
           </div>
           <div className="hud-stat">
             <div className="l">Vidas</div>
-            <div className="v" style={{ color: '#33cc33' }}>
+            <div className="v" style={{ color: p?.primary, textShadow: `0 0 8px ${p?.primary}99` }}>
               {lives > 0 ? '♥ '.repeat(lives).trim() : '—'}
             </div>
           </div>
           <div className="hud-stat">
             <div className="l">Nivel</div>
-            <div className="v" style={{ color: '#33cc33' }}>{String(level).padStart(2, '0')}</div>
+            <div className="v" style={{ color: p?.primary, textShadow: `0 0 8px ${p?.primary}66` }}>
+              {String(level).padStart(2, '0')}
+            </div>
           </div>
         </div>
         <button
           className="btn yellow"
           style={{ fontSize: 10, padding: '4px 12px' }}
-          onClick={() => setPaused((p) => !p)}
+          onClick={() => setPaused((prev) => !prev)}
         >
           {paused ? 'REANUDAR' : 'PAUSA'}
         </button>
@@ -159,6 +183,7 @@ export default function FroggerPlayPage() {
           <FroggerGame
             key={gameKey}
             paused={paused}
+            palette={p ? { bg: p.bg, primary: p.primary, accent: p.accent, text: p.text } : undefined}
             onScoreChange={handleScoreChange}
             onLivesChange={handleLivesChange}
             onLevelChange={handleLevelChange}
@@ -168,6 +193,67 @@ export default function FroggerPlayPage() {
       </div>
 
       <TouchControls keyMap={{ '◀': 'ArrowLeft', '▲': 'ArrowUp', '▼': 'ArrowDown', '▶': 'ArrowRight' }} />
+
+      {/* Selector de skin */}
+      {skins.length > 0 && (
+        <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{
+            fontFamily: 'var(--mono)',
+            fontSize: 9,
+            letterSpacing: '0.2em',
+            color: '#444',
+            textTransform: 'uppercase',
+            marginRight: 6,
+          }}>
+            SKIN
+          </span>
+          {skins.map((s) => {
+            const active = s.id === skinId;
+            return (
+              <button
+                key={s.id}
+                onClick={() => handleSkinChange(s.id as SkinId)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  padding: '5px 13px 5px 9px',
+                  background: active ? `${s.palette.primary}14` : 'transparent',
+                  border: `1px solid ${active ? s.palette.primary : '#2a2a3a'}`,
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: active ? `0 0 10px ${s.palette.primary}44` : 'none',
+                }}
+              >
+                <span style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: s.palette.primary,
+                    boxShadow: active ? `0 0 6px ${s.palette.primary}` : 'none',
+                    flexShrink: 0,
+                  }} />
+                  <span style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: s.palette.accent,
+                    boxShadow: active ? `0 0 6px ${s.palette.accent}` : 'none',
+                    flexShrink: 0,
+                  }} />
+                </span>
+                <span style={{
+                  fontFamily: 'var(--pixel)',
+                  fontSize: 8,
+                  letterSpacing: '0.15em',
+                  color: active ? s.palette.primary : '#444',
+                  transition: 'color 0.2s ease',
+                }}>
+                  {s.label.toUpperCase()}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Modal game over */}
       {over && (
