@@ -8,3 +8,4 @@
 | 2026-06-29 | Galaxian | `galaxian` | SHOOTER | sugerido | SHOOTER necesita mecánica de dive-bombing diferente a disparos fijos e inercia libre |
 | 2026-06-29 | Escalada | `escalada` | ARCADE | sugerido | Ningún ARCADE tiene eje Y dominante ni plataformas; cubre ese vacío clásico |
 | 2026-06-29 | Bomba (Bomberman) | `bomba` | VERSUS | sugerido | Territory control + destrucción de entorno, mecánicas ausentes en todo el catálogo |
+| 2026-06-30 | Ciempiés | `ciempies` | SHOOTER | sugerido | Único SHOOTER con entorno destruible acumulativo; campo de hongos cambia la ruta del enemigo cada partida |

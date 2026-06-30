@@ -128,6 +128,12 @@ const LEVELS = (() => {
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
+// ── Hoisted ctx state (set once, not per frame) ───────────────────────────────
+ctx.font = 'bold 18px monospace';
+ctx.fillStyle = '#fff';
+ctx.textAlign = 'left';
+ctx.textBaseline = 'top';
+
 const PADDLE_SPEED = 400;
 const BLOCK_COLS = 10;
 const BLOCK_ROWS = 6;
@@ -302,14 +308,18 @@ function update(dt) {
   }
 }
 
+const OVERLAY_FONT = 'bold 64px monospace';
 function drawOverlay(message) {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 64px monospace';
+  ctx.font = OVERLAY_FONT;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+  // restore defaults used in draw()
+  ctx.font = 'bold 18px monospace';
+  ctx.textBaseline = 'top';
 }
 
 const PAUSE_BTN_W = 60;
@@ -318,35 +328,39 @@ const PAUSE_BTN_GAP = 12;
 const PAUSE_BTN_Y = 340;
 const PAUSE_BTN_ROW_X = (canvas.width - (5 * PAUSE_BTN_W + 4 * PAUSE_BTN_GAP)) / 2;
 
+const PAUSE_TITLE_FONT = 'bold 56px monospace';
+const PAUSE_SUB_FONT   = 'bold 16px monospace';
+const PAUSE_BTN_FONT   = 'bold 20px monospace';
 function drawPauseOverlay() {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold 56px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  ctx.font = PAUSE_TITLE_FONT;
   ctx.fillText('PAUSA', canvas.width / 2, 260);
 
-  ctx.font = 'bold 16px monospace';
+  ctx.font = PAUSE_SUB_FONT;
   ctx.fillText('Saltar al nivel:', canvas.width / 2, 310);
 
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.font = PAUSE_BTN_FONT;
   for (let i = 0; i < 5; i++) {
     const bx = PAUSE_BTN_ROW_X + i * (PAUSE_BTN_W + PAUSE_BTN_GAP);
     const isActive = (i + 1) === currentLevel;
     ctx.fillStyle = isActive ? '#f0c040' : '#444';
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.roundRect(bx, PAUSE_BTN_Y, PAUSE_BTN_W, PAUSE_BTN_H, 6);
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = isActive ? '#000' : '#fff';
-    ctx.font = 'bold 20px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
     ctx.fillText(i + 1, bx + PAUSE_BTN_W / 2, PAUSE_BTN_Y + PAUSE_BTN_H / 2);
   }
+  // restore defaults used in draw()
+  ctx.font = 'bold 18px monospace';
+  ctx.textBaseline = 'top';
 }
 
 function draw() {
@@ -366,10 +380,9 @@ function draw() {
   drawSprite(ctx, 'ball', ball.x, ball.y, ball.w, ball.h);
 
   if (gameState === 'playing') {
+    // ctx.font and ctx.textBaseline are already set to the right values at init
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 18px monospace';
     ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
     ctx.fillText('Score: ' + score, 10, 10);
     ctx.textAlign = 'center';
     ctx.fillText('Nivel: ' + currentLevel, canvas.width / 2, 10);
