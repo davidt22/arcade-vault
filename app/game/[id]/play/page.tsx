@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
 import { GAMES, type Skin } from '@/lib/data';
+import { useCanvasScale } from '@/hooks/useCanvasScale';
+import { TouchControls } from '@/components/TouchControls';
 
 const SKIN_CANVAS_FILTER: Record<string, string> = {
   classic: 'none',
@@ -14,6 +16,17 @@ const SKIN_CANVAS_FILTER: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 // Asteroids — selector de skin + canvas + overlay React
 // ─────────────────────────────────────────────────────────────────────────────
+function useIsPortrait() {
+  const [portrait, setPortrait] = useState(false);
+  useEffect(() => {
+    const check = () => setPortrait(window.innerWidth < window.innerHeight);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return portrait;
+}
+
 function AsteroidsGame() {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -21,6 +34,8 @@ function AsteroidsGame() {
   const [gameState, setGameState] = useState<'playing' | 'dead' | 'gameover'>('playing');
   const [sessionMsg, setSessionMsg] = useState<string | null>(null);
   const [skinId, setSkinId] = useState<'classic' | 'neon' | 'retro'>('classic');
+  const portrait = useIsPortrait();
+  const scale = useCanvasScale(800, 600);
 
   const levelRef = useRef(1);
   const scoreSavedRef = useRef(false);
@@ -101,6 +116,23 @@ function AsteroidsGame() {
 
   const p = skin?.palette;
 
+  if (portrait) return (
+    <div style={{
+      minHeight: '100vh',
+      background: p?.bg ?? '#000',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 16,
+    }}>
+      <span style={{ fontSize: 48 }}>↻</span>
+      <p style={{ fontFamily: 'var(--pixel)', fontSize: 11, letterSpacing: '0.14em', color: 'var(--cyan)', textAlign: 'center' }}>
+        GIRA EL DISPOSITIVO
+      </p>
+    </div>
+  );
+
   return (
     <div
       style={{
@@ -114,14 +146,15 @@ function AsteroidsGame() {
         transition: 'background 0.4s ease',
       }}
     >
-      <div style={{ position: 'relative', width: 800, maxWidth: '100%' }}>
+      <div style={{ position: 'relative', width: 800 * scale, height: 600 * scale }}>
         <canvas
           id="canvas"
           width={800}
           height={600}
           style={{
             display: 'block',
-            width: '100%',
+            transformOrigin: 'top left',
+            transform: `scale(${scale})`,
             filter: SKIN_CANVAS_FILTER[skinId] ?? 'none',
             transition: 'filter 0.35s ease',
           }}
@@ -184,6 +217,8 @@ function AsteroidsGame() {
           )}
         </div>
       </div>
+
+      <TouchControls keyMap={{ '◀': 'ArrowLeft', '▶': 'ArrowRight', '▲': 'ArrowUp', '🔥': ' ' }} />
 
       {/* Selector de skin */}
       {skins.length > 0 && (
@@ -293,6 +328,8 @@ function ArkanoidGame() {
   const [level, setLevel] = useState(1);
   const [gameState, setGameState] = useState<'playing' | 'dead' | 'gameover'>('playing');
   const [sessionMsg, setSessionMsg] = useState<string | null>(null);
+  const portrait = useIsPortrait();
+  const scale = useCanvasScale(800, 600);
 
   const levelRef = useRef(1);
   const scoreSavedRef = useRef(false);
@@ -358,6 +395,23 @@ function ArkanoidGame() {
     };
   }, []);
 
+  if (portrait) return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#000',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 16,
+    }}>
+      <span style={{ fontSize: 48 }}>↻</span>
+      <p style={{ fontFamily: 'var(--pixel)', fontSize: 11, letterSpacing: '0.14em', color: 'var(--cyan)', textAlign: 'center' }}>
+        GIRA EL DISPOSITIVO
+      </p>
+    </div>
+  );
+
   return (
     <div
       style={{
@@ -370,12 +424,12 @@ function ArkanoidGame() {
         paddingBottom: 32,
       }}
     >
-      <div style={{ position: 'relative', width: 800, maxWidth: '100%' }}>
+      <div style={{ position: 'relative', width: 800 * scale, height: 600 * scale }}>
         <canvas
           id="game"
           width={800}
           height={600}
-          style={{ display: 'block', width: '100%' }}
+          style={{ display: 'block', transformOrigin: 'top left', transform: `scale(${scale})` }}
         />
 
         {/* Overlay React — flotante sobre el canvas */}
@@ -417,6 +471,8 @@ function ArkanoidGame() {
         </div>
       </div>
 
+      <TouchControls keyMap={{ '◀': 'ArrowLeft', '▶': 'ArrowRight' }} />
+
       {sessionMsg && (
         <p
           className="pixel neon-cyan"
@@ -437,6 +493,7 @@ function TetrisGame() {
   const [level, setLevel] = useState(1);
   const [gameState, setGameState] = useState<'playing' | 'gameover'>('playing');
   const [sessionMsg, setSessionMsg] = useState<string | null>(null);
+  const scale = useCanvasScale(474, 600);
 
   const levelRef = useRef(1);
   const scoreSavedRef = useRef(false);
@@ -519,52 +576,62 @@ function TetrisGame() {
         <button id="restart-btn" type="button" />
       </div>
 
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-        {/* Canvas principal del tablero 300×600 */}
-        <canvas
-          id="board"
-          width={300}
-          height={600}
-          style={{ display: 'block', border: '1px solid rgba(77,208,225,0.25)' }}
-        />
+      <div style={{ width: 474 * scale, height: 600 * scale, position: 'relative' }}>
+        <div style={{
+          display: 'flex',
+          gap: 24,
+          alignItems: 'flex-start',
+          transformOrigin: 'top left',
+          transform: `scale(${scale})`,
+        }}>
+          {/* Canvas principal del tablero 300×600 */}
+          <canvas
+            id="board"
+            width={300}
+            height={600}
+            style={{ display: 'block', border: '1px solid rgba(77,208,225,0.25)' }}
+          />
 
-        {/* Sidebar: preview pieza siguiente + HUD React */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 8 }}>
-          <div>
-            <div
-              className="pixel"
-              style={{ fontSize: 8, color: 'var(--ink-dim)', letterSpacing: '0.2em', marginBottom: 8 }}
-            >
-              SIGUIENTE
-            </div>
-            <canvas
-              id="next-canvas"
-              width={120}
-              height={120}
-              style={{ display: 'block', border: '1px solid rgba(77,208,225,0.15)', background: '#000' }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div className="hud-stat">
-              <div className="l">Puntuación</div>
-              <div className="v">{score.toLocaleString('es-ES')}</div>
-            </div>
-            <div className="hud-stat level">
-              <div className="l">Nivel</div>
-              <div className="v">{String(level).padStart(2, '0')}</div>
-            </div>
-            {gameState === 'gameover' && (
+          {/* Sidebar: preview pieza siguiente + HUD React */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 8 }}>
+            <div>
               <div
-                className="pixel neon-magenta"
-                style={{ fontSize: 11, letterSpacing: '0.14em', marginTop: 6 }}
+                className="pixel"
+                style={{ fontSize: 8, color: 'var(--ink-dim)', letterSpacing: '0.2em', marginBottom: 8 }}
               >
-                GAME OVER
+                SIGUIENTE
               </div>
-            )}
+              <canvas
+                id="next-canvas"
+                width={120}
+                height={120}
+                style={{ display: 'block', border: '1px solid rgba(77,208,225,0.15)', background: '#000' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div className="hud-stat">
+                <div className="l">Puntuación</div>
+                <div className="v">{score.toLocaleString('es-ES')}</div>
+              </div>
+              <div className="hud-stat level">
+                <div className="l">Nivel</div>
+                <div className="v">{String(level).padStart(2, '0')}</div>
+              </div>
+              {gameState === 'gameover' && (
+                <div
+                  className="pixel neon-magenta"
+                  style={{ fontSize: 11, letterSpacing: '0.14em', marginTop: 6 }}
+                >
+                  GAME OVER
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      <TouchControls keyMap={{ '◀': 'ArrowLeft', '▶': 'ArrowRight', '↻': 'ArrowUp', '▼': 'ArrowDown', '⬇': ' ' }} />
 
       {sessionMsg && (
         <p
