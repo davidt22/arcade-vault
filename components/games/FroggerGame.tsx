@@ -72,6 +72,37 @@ export interface FroggerGameProps {
   onGameOver: (finalScore: number) => void;
 }
 
+// ─── Color cache ──────────────────────────────────────────────────────────────
+interface ColorCache {
+  bgDim: string;
+  bgMid: string;
+  primaryFaint: string;
+  primaryQuarter: string;
+  turtleFill: string;
+  turtleStroke: string;
+  logTint: string;
+  accentBorder: string;
+  accentFaint: string;
+  accentSub: string;
+  carShades: [string, string, string];
+}
+
+function buildColorCache(p: FroggerPalette): ColorCache {
+  return {
+    bgDim:          p.bg + '66',
+    bgMid:          p.bg + 'cc',
+    primaryFaint:   p.primary + '18',
+    primaryQuarter: p.primary + '44',
+    turtleFill:     p.primary + 'bb',
+    turtleStroke:   p.primary + '66',
+    logTint:        p.primary + '22',
+    accentBorder:   p.accent + 'aa',
+    accentFaint:    p.accent + '55',
+    accentSub:      p.accent + '33',
+    carShades:      [p.accent, p.accent + 'bb', p.accent + '88'],
+  };
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function buildLanes(level: number): Lane[] {
   const speedMultiplier = Math.pow(1.15, level - 1);
@@ -170,6 +201,42 @@ export default function FroggerGame({
     if (!canvas) return;
     const ctx = canvas.getContext('2d')!;
     const s = stateRef.current;
+
+    let colorCache = buildColorCache(paletteRef.current);
+    let cachedPaletteKey = paletteRef.current.bg + paletteRef.current.primary + paletteRef.current.accent;
+    let bgDirty = true;
+    function updateColorCacheIfNeeded() {
+      const p = paletteRef.current;
+      const key = p.bg + p.primary + p.accent;
+      if (key !== cachedPaletteKey) {
+        colorCache = buildColorCache(p);
+        cachedPaletteKey = key;
+        bgDirty = true;
+      }
+    }
+
+    ctx.font = 'bold 14px monospace';
+
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width = CANVAS_W;
+    bgCanvas.height = CANVAS_H;
+    const bgCtx = bgCanvas.getContext('2d')!;
+    function renderBackground(cache: ColorCache, p: FroggerPalette) {
+      for (let r = 0; r < ROWS; r++) {
+        if (r === ROW_GOALS) {
+          bgCtx.fillStyle = cache.bgDim;
+          bgCtx.fillRect(0, r * CELL, CANVAS_W, CELL);
+          bgCtx.fillStyle = cache.primaryFaint;
+        } else if (r >= ROW_RIVER_TOP && r <= ROW_RIVER_BOT) {
+          bgCtx.fillStyle = '#001a33';
+        } else if (r === ROW_SAFE_MID || r === ROW_START) {
+          bgCtx.fillStyle = cache.bgMid;
+        } else {
+          bgCtx.fillStyle = p.bg;
+        }
+        bgCtx.fillRect(0, r * CELL, CANVAS_W, CELL);
+      }
+    }
 
     // ── Input ──────────────────────────────────────────────────────────────
     const onKey = (e: KeyboardEvent) => {
@@ -350,33 +417,26 @@ export default function FroggerGame({
 
     // ── Draw ───────────────────────────────────────────────────────────────
     function draw() {
+      updateColorCacheIfNeeded();
+      const cache = colorCache;
       ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
       const f = s.frog;
       const p = paletteRef.current;
 
-      // Fondo por zonas
-      for (let r = 0; r < ROWS; r++) {
-        if (r === ROW_GOALS) {
-          ctx.fillStyle = p.bg + '66';
-          ctx.fillRect(0, r * CELL, CANVAS_W, CELL);
-          ctx.fillStyle = p.primary + '18';
-        } else if (r >= ROW_RIVER_TOP && r <= ROW_RIVER_BOT) {
-          ctx.fillStyle = '#001a33';
-        } else if (r === ROW_SAFE_MID || r === ROW_START) {
-          ctx.fillStyle = p.bg + 'cc';
-        } else {
-          ctx.fillStyle = p.bg;
-        }
-        ctx.fillRect(0, r * CELL, CANVAS_W, CELL);
+      // Fondo por zonas — offscreen canvas, se repinta solo al cambiar paleta
+      if (bgDirty) {
+        renderBackground(cache, p);
+        bgDirty = false;
       }
+      ctx.drawImage(bgCanvas, 0, 0);
 
       // Bocas destino
       const goalCols = [1, 4, 7, 10, 13];
       for (let i = 0; i < 5; i++) {
         const x = goalCols[i] * CELL;
-        ctx.fillStyle = s.goals[i] ? p.primary + '44' : '#000000aa';
+        ctx.fillStyle = s.goals[i] ? cache.primaryQuarter : '#000000aa';
         ctx.fillRect(x, 0, CELL * 2, CELL);
-        ctx.strokeStyle = p.accent + 'aa';
+        ctx.strokeStyle = cache.accentBorder;
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 1, 1, CELL * 2 - 2, CELL - 2);
         if (s.goals[i]) {
@@ -394,41 +454,45 @@ export default function FroggerGame({
           const x = ent.col * CELL;
           const w = ent.width * CELL;
           if (ent.type === 'car') {
-            // Variaciones de color del coche según carril
-            const shade = ['', 'bb', '88'][lane.row % 3];
-            ctx.fillStyle = p.accent + shade;
+            ctx.fillStyle = cache.carShades[lane.row % 3];
             ctx.fillRect(x + 2, y + 8, w - 4, CELL - 16);
             ctx.fillStyle = '#111';
-            ctx.beginPath(); ctx.arc(x + 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(x + w - 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + 8, y + CELL - 8, 5, 0, Math.PI * 2);
+            ctx.arc(x + w - 8, y + CELL - 8, 5, 0, Math.PI * 2);
+            ctx.fill();
           } else if (ent.type === 'truck') {
-            ctx.fillStyle = p.accent + '55';
+            ctx.fillStyle = cache.accentFaint;
             ctx.fillRect(x + 2, y + 6, w - 4, CELL - 12);
-            ctx.fillStyle = p.accent + '33';
+            ctx.fillStyle = cache.accentSub;
             ctx.fillRect(x + 2, y + 6, CELL - 4, CELL - 12);
             ctx.fillStyle = '#111';
-            ctx.beginPath(); ctx.arc(x + 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(x + w - 8, y + CELL - 8, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x + 8, y + CELL - 8, 5, 0, Math.PI * 2);
+            ctx.arc(x + w - 8, y + CELL - 8, 5, 0, Math.PI * 2);
+            ctx.fill();
           } else if (ent.type === 'log') {
             ctx.fillStyle = '#7a3b10';
             ctx.fillRect(x + 1, y + 6, w - 2, CELL - 12);
             ctx.strokeStyle = '#5a2b08';
             ctx.lineWidth = 1;
+            ctx.beginPath();
             for (let lx = x + 8; lx < x + w; lx += 12) {
-              ctx.beginPath(); ctx.moveTo(lx, y + 6); ctx.lineTo(lx, y + CELL - 6); ctx.stroke();
+              ctx.moveTo(lx, y + 6); ctx.lineTo(lx, y + CELL - 6);
             }
+            ctx.stroke();
             // Tono de piel de la paleta en la corteza
-            ctx.fillStyle = p.primary + '22';
+            ctx.fillStyle = cache.logTint;
             ctx.fillRect(x + 1, y + 6, w - 2, CELL - 12);
           } else if (ent.type === 'turtle') {
             if (ent.submerged) ctx.globalAlpha = 0.3;
             for (let ti = 0; ti < ent.width; ti++) {
               const tx = x + ti * CELL;
-              ctx.fillStyle = p.primary + 'bb';
+              ctx.fillStyle = cache.turtleFill;
               ctx.beginPath();
               ctx.ellipse(tx + CELL / 2, y + CELL / 2, 16, 14, 0, 0, Math.PI * 2);
               ctx.fill();
-              ctx.strokeStyle = p.primary + '66';
+              ctx.strokeStyle = cache.turtleStroke;
               ctx.lineWidth = 1;
               ctx.beginPath();
               ctx.moveTo(tx + CELL / 2 - 8, y + CELL / 2);
@@ -474,7 +538,6 @@ export default function FroggerGame({
       ctx.fillStyle = barColor;
       ctx.fillRect(0, 0, CANVAS_W * timerRatio, 6);
 
-      ctx.font = 'bold 14px monospace';
       ctx.fillStyle = p.text;
       ctx.textAlign = 'left';
       ctx.fillText(`SCORE ${s.score}`, 6, CELL - 8);
