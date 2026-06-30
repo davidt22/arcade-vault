@@ -158,6 +158,11 @@ export const GAMES: Game[] = [
     color: "lime",
     best: 0,
     plays: "0",
+    skins: [
+      { id: 'classic', label: 'Clásico', palette: { bg: '#000000', primary: '#00FF41', accent: '#00FF41', text: '#FFFFFF' } },
+      { id: 'neon',    label: 'Neón',    palette: { bg: '#050510', primary: '#00FFFF', accent: '#FF00FF', text: '#00FFFF' } },
+      { id: 'retro',   label: 'Retro',   palette: { bg: '#0A0A04', primary: '#33FF00', accent: '#FF8800', text: '#33FF00' } },
+    ],
   },
   {
     id: "duelo-pixel",

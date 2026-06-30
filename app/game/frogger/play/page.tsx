@@ -1,9 +1,20 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
-import { createClient } from '@/lib/supabase/client';
+import { TouchControls } from '@/components/TouchControls';
+
+function useIsPortrait() {
+  const [portrait, setPortrait] = useState(false);
+  useEffect(() => {
+    const check = () => setPortrait(window.innerWidth < window.innerHeight);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return portrait;
+}
 
 const CANVAS_W = 640;
 const CANVAS_H = 560;
@@ -27,6 +38,7 @@ export default function FroggerPlayPage() {
   const finalLevelRef = useRef(1);
 
   const scale = useCanvasScale(CANVAS_W, CANVAS_H);
+  const portrait = useIsPortrait();
 
   const handleScoreChange = useCallback((s: number) => setScore(s), []);
   const handleLivesChange = useCallback((l: number) => setLives(l), []);
@@ -45,6 +57,7 @@ export default function FroggerPlayPage() {
     const trimmed = name.trim() || 'INVITADO';
     localStorage.setItem('av_player_name', trimmed);
 
+    const { createClient } = await import('@/lib/supabase/client');
     const supabase = createClient();
     await supabase.from('scores').insert({
       game_id: 'frogger',
@@ -67,6 +80,23 @@ export default function FroggerPlayPage() {
     setSaving(false);
     setGameKey((k) => k + 1);
   }
+
+  if (portrait) return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#000',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 16,
+    }}>
+      <span style={{ fontSize: 48 }}>↻</span>
+      <p style={{ fontFamily: 'var(--pixel)', fontSize: 11, letterSpacing: '0.14em', color: 'var(--cyan)', textAlign: 'center' }}>
+        GIRA EL DISPOSITIVO
+      </p>
+    </div>
+  );
 
   return (
     <div
@@ -136,6 +166,8 @@ export default function FroggerPlayPage() {
           />
         </div>
       </div>
+
+      <TouchControls keyMap={{ '◀': 'ArrowLeft', '▲': 'ArrowUp', '▼': 'ArrowDown', '▶': 'ArrowRight' }} />
 
       {/* Modal game over */}
       {over && (
