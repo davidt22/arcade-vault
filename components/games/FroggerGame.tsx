@@ -486,21 +486,25 @@ export default function FroggerGame({
             ctx.fillRect(x + 1, y + 6, w - 2, CELL - 12);
           } else if (ent.type === 'turtle') {
             if (ent.submerged) ctx.globalAlpha = 0.3;
+            // Batch fills
+            ctx.fillStyle = cache.turtleFill;
+            ctx.beginPath();
+            for (let ti = 0; ti < ent.width; ti++) {
+              ctx.ellipse(x + ti * CELL + CELL / 2, y + CELL / 2, 16, 14, 0, 0, Math.PI * 2);
+            }
+            ctx.fill();
+            // Batch strokes
+            ctx.strokeStyle = cache.turtleStroke;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
             for (let ti = 0; ti < ent.width; ti++) {
               const tx = x + ti * CELL;
-              ctx.fillStyle = cache.turtleFill;
-              ctx.beginPath();
-              ctx.ellipse(tx + CELL / 2, y + CELL / 2, 16, 14, 0, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.strokeStyle = cache.turtleStroke;
-              ctx.lineWidth = 1;
-              ctx.beginPath();
               ctx.moveTo(tx + CELL / 2 - 8, y + CELL / 2);
               ctx.lineTo(tx + CELL / 2 + 8, y + CELL / 2);
               ctx.moveTo(tx + CELL / 2, y + CELL / 2 - 8);
               ctx.lineTo(tx + CELL / 2, y + CELL / 2 + 8);
-              ctx.stroke();
             }
+            ctx.stroke();
             ctx.globalAlpha = 1;
           }
         }
@@ -516,18 +520,24 @@ export default function FroggerGame({
       ctx.beginPath();
       ctx.ellipse(fx, fy - jumpArc, 14, 12, 0, 0, Math.PI * 2);
       ctx.fill();
-      // Ojos
+      // Ojos — batch por color
       ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(fx - 5, fy - jumpArc - 5, 4, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(fx + 5, fy - jumpArc - 5, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(fx - 5, fy - jumpArc - 5, 4, 0, Math.PI * 2);
+      ctx.arc(fx + 5, fy - jumpArc - 5, 4, 0, Math.PI * 2);
+      ctx.fill();
       ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.arc(fx - 5, fy - jumpArc - 5, 2, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(fx + 5, fy - jumpArc - 5, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(fx - 5, fy - jumpArc - 5, 2, 0, Math.PI * 2);
+      ctx.arc(fx + 5, fy - jumpArc - 5, 2, 0, Math.PI * 2);
+      ctx.fill();
       if (f.animating) {
         ctx.strokeStyle = p.primary;
         ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.moveTo(fx - 14, fy - jumpArc); ctx.lineTo(fx - 20, fy - jumpArc + 6); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(fx + 14, fy - jumpArc); ctx.lineTo(fx + 20, fy - jumpArc + 6); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(fx - 14, fy - jumpArc); ctx.lineTo(fx - 20, fy - jumpArc + 6);
+        ctx.moveTo(fx + 14, fy - jumpArc); ctx.lineTo(fx + 20, fy - jumpArc + 6);
+        ctx.stroke();
       }
 
       // HUD interno — barra de tiempo
@@ -544,12 +554,12 @@ export default function FroggerGame({
       ctx.textAlign = 'center';
       ctx.fillText(`LV ${String(s.level).padStart(2, '0')}`, CANVAS_W / 2, CELL - 8);
       ctx.textAlign = 'right';
+      ctx.fillStyle = p.primary;
+      ctx.beginPath();
       for (let i = 0; i < s.lives; i++) {
-        ctx.fillStyle = p.primary;
-        ctx.beginPath();
         ctx.arc(CANVAS_W - 12 - i * 22, CELL - 12, 7, 0, Math.PI * 2);
-        ctx.fill();
       }
+      ctx.fill();
     }
 
     // ── Loop ───────────────────────────────────────────────────────────────
