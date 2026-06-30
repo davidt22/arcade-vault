@@ -13,6 +13,8 @@ Usar el skill `/game-planner` para decidir qué juego integrar a continuación. 
 
 Usar `/skin-designer [<game-id>]` para auditar y crear las 3 skins requeridas (classic, neon, retro) en cada juego. Sin argumento audita todos; con argumento audita solo ese juego.
 
+Usar `/mobile-porter [<game-id>]` para auditar y reparar la experiencia móvil de los juegos (useCanvasScale, TouchControls, overlay portrait). Sin argumento audita todos; con argumento audita solo ese juego.
+
 ## Arquitectura
 
 **Arcade Vault** es una plataforma retro de juegos arcade online con clasificaciones competitivas.
@@ -63,6 +65,11 @@ Establecido en spec-04 (Asteroids). Cada juego sigue este patrón:
 3. **Cleanup**: `window.destroy<GameId>()` — detiene el loop al desmontar el componente
 4. **Componente React**: `<GameId>Game` en `app/game/[id]/play/page.tsx` con overlay HUD
 5. **Dispatch en page**: `if (id === '<id>') return <<GameId>Game />;`
+6. **Soporte táctil** (spec-07): cada componente debe incluir:
+   - `useCanvasScale(nativeW, nativeH)` → aplica `transform: scale(scale)` al canvas con `transformOrigin: 'top left'`; el wrapper toma `width: nativeW * scale, height: nativeH * scale`
+   - `<TouchControls keyMap={{ 'Label': 'KeyboardEvent.key', ... }}>` debajo del canvas
+   - Para juegos **landscape** (canvas más ancho que alto): añadir `useIsPortrait()` y mostrar overlay "GIRA EL DISPOSITIVO" en portrait
+   - Para juegos **portrait** (canvas más alto que ancho, e.g. Tetris): sin restricción de orientación
 
 Ver lista completa de juegos cuando lo necesites y su estado de implementación en `references/implemented-games.md`.
 
